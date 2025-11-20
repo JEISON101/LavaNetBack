@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,10 +26,11 @@ public class UsuarioController {
     UsuarioService usuarioService;
 
     @GetMapping("/listar")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<ResponseDto> getAllUsuarios(){
         try {
             ArrayList<Usuario> usuarios = usuarioService.getAllUsuarios();
-            ResponseDto response = new ResponseDto(true, "Usuarios obtenidos correctamente", usuarios, null);
+            ResponseDto response = new ResponseDto(true, "Usuarios obtenidos correctamente", usuarios);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             ResponseDto response = new ResponseDto(false, "Error al obtener los usuarios", null, e.getMessage());
@@ -37,6 +39,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/listar/{idUsuario}")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<ResponseDto> getUsuariosId(@PathVariable Integer idUsuario) {
         try {
             Usuario usuario = usuarioService.getUsuarioId(idUsuario);
@@ -49,6 +52,7 @@ public class UsuarioController {
     }
 
     @PutMapping("/editar/{idUsuario}")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<ResponseDto> putUsuario(@PathVariable Integer idUsuario, @RequestBody Usuario usuario) {
         try {
             Usuario actualizado = usuarioService.putUsuario(usuario, idUsuario);
@@ -62,6 +66,7 @@ public class UsuarioController {
     }
 
     @DeleteMapping("/eliminar/{idUsuario}")
+    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<ResponseDto> deleteUsuario(@PathVariable Integer idUsuario){
         try {
             usuarioService.deleteUsuario(idUsuario);

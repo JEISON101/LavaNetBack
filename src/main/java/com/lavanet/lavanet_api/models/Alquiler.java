@@ -1,7 +1,12 @@
 package com.lavanet.lavanet_api.models;
 
+import java.sql.Timestamp;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -25,12 +30,15 @@ public class Alquiler {
   private int idAlquiler;
   private String estado;
   private Float total;
-  private String fechaInicio;
-  private String fechaFin;
+  private Timestamp fechaInicio;
+  private Timestamp fechaFin;
   private String direccionEntrega;
   private String formaPago;
   private int catidad;
-  private String created;
+
+  @CreationTimestamp
+  @Column(nullable = false, updatable = false)
+  private Timestamp created;
 
   //relacion con el cliente
   @ManyToOne(fetch = FetchType.LAZY)

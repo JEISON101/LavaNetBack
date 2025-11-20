@@ -24,12 +24,12 @@ public class Favoritos {
   private int idFavorito;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "cliente_id")
+  @JoinColumn(name = "cliente_id", nullable = false)
   private Usuario cliente;
 
   // Proveedor que fue marcado como favorito
   @ManyToOne(fetch = FetchType.LAZY)
   @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-  @JoinColumn(name = "proveedor_id")
+  @JoinColumn(name = "proveedor_id", nullable = false)
   private Usuario proveedor;  
 }

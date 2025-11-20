@@ -7,9 +7,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.lavanet.lavanet_api.config.JwtUtil;
-import com.lavanet.lavanet_api.dtos.AuthResponse;
 import com.lavanet.lavanet_api.dtos.LoginRequest;
 import com.lavanet.lavanet_api.dtos.RegisterRequest;
+import com.lavanet.lavanet_api.dtos.ResponseDto;
 import com.lavanet.lavanet_api.models.Usuario;
 import com.lavanet.lavanet_api.repositories.UsuarioRepository;
 
@@ -50,7 +50,7 @@ public class UsuarioService {
         usuarioRepository.deleteById(idUsuario);
     }
 
-    public AuthResponse register(RegisterRequest request) {
+    public Usuario register(RegisterRequest request) {
         if (usuarioRepository.findByCorreo(request.getCorreo()).isPresent()) {
             throw new RuntimeException("Este correo ya se encuentra registrado");
         }
@@ -67,11 +67,10 @@ public class UsuarioService {
         
         usuarioRepository.save(usuario);
         
-        String token = jwtUtil.generateToken(usuario.getCorreo(), usuario.getRol());
-        return new AuthResponse(token);
+        return usuario;
     }
 
-    public AuthResponse login(LoginRequest request) {
+    public ResponseDto login(LoginRequest request) {
         Usuario usuario = usuarioRepository.findByCorreo(request.getCorreo())
                 .orElseThrow(() -> new RuntimeException("Correo no encontrado."));
 
@@ -80,6 +79,6 @@ public class UsuarioService {
         }
 
         String token = jwtUtil.generateToken(usuario.getCorreo(), usuario.getRol());
-        return new AuthResponse(token);
+        return new ResponseDto(true, "Inicio de sesión exitoso", null, null, token);
     }
 }
