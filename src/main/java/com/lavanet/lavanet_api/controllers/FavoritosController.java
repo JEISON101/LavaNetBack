@@ -3,6 +3,7 @@ package com.lavanet.lavanet_api.controllers;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +28,7 @@ public class FavoritosController {
   UsuarioService usuarioService;
 
   @GetMapping("/listar/{idUsuario}")
+  @PreAuthorize("hasRole('Administrador'||'Cliente')")
   public ArrayList<Favoritos> getFavoritosCliente(@PathVariable Integer idUsuario){
     Usuario usuario = usuarioService.getUsuarioId(idUsuario);
     if(usuario == null) return null;
@@ -34,11 +36,13 @@ public class FavoritosController {
   }
 
   @PostMapping("/registrar")
+  @PreAuthorize("hasRole('Administrador'||'Cliente')")
   public Favoritos createFavorito(@RequestBody Favoritos favorito) {
       return favoritosSevice.createFavorito(favorito);
   }
 
   @DeleteMapping("/eliminar/{idFavorito}")
+  @PreAuthorize("hasRole('Administrador'||'Cliente')")
   public String deleteFavorito(@PathVariable Integer idFavorito){
     try {
       favoritosSevice.deleteFavorito(idFavorito);

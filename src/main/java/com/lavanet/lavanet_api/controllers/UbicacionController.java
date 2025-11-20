@@ -14,10 +14,9 @@ public class UbicacionController {
     @Autowired
     private UbicacionService ubicacionService;
 
-    @MessageMapping("/ubicacion") // los clientes envían aquí
-    @SendTo("/topic/ubicaciones") // y todos los suscritos reciben
+    @MessageMapping("/ubicacion")
+    @SendTo("/topic/ubicaciones")
     public Ubicacion enviarUbicacion(Ubicacion ubicacion) {
-        // guarda o actualiza la ubicación antes de retransmitirla
         Ubicacion actualizada = ubicacionService.guardarOActualizarUbicacion(
             ubicacion.getUsuario().getIdUsuario(),
             ubicacion.getLatitud(),

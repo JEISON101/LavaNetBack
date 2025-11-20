@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.lavanet.lavanet_api.dtos.AuthResponse;
 import com.lavanet.lavanet_api.dtos.LoginRequest;
 import com.lavanet.lavanet_api.dtos.RegisterRequest;
+import com.lavanet.lavanet_api.dtos.ResponseDto;
 import com.lavanet.lavanet_api.services.UsuarioService;
 
 import lombok.RequiredArgsConstructor;
@@ -21,12 +21,12 @@ public class AuthController {
     private final UsuarioService usuarioService;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(usuarioService.register(request));
+    public ResponseEntity<ResponseDto> register(@RequestBody RegisterRequest request) {
+        return ResponseEntity.ok(new ResponseDto(true, "Usuario registrado correctamente", usuarioService.register(request)));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<ResponseDto> login(@RequestBody LoginRequest request) {
         return ResponseEntity.ok(usuarioService.login(request));
     }
 }

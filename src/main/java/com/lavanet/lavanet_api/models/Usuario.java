@@ -32,9 +32,10 @@ public class Usuario {
     private String fechaNacimiento;
     private String direccion;
     private String correo;
-    private String rol;
     private String password;
     private String telefono;
+    
+    private String rol;
     
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

@@ -29,22 +29,22 @@ public class AlquilerController {
   }
 
   @GetMapping("/listar/cliente/{idUsuario}")
-  public ArrayList<Alquiler> getAlquileresByCliente(@PathVariable Integer idusuario) {
+  public ArrayList<Alquiler> getAlquileresByCliente(@PathVariable Integer idUsuario) {
     try {
-      return null;
+      return alquilerService.getAlquileresByCliente(idUsuario);
     } catch (Exception e) {
       return null;
     }
   }
 
-/*   @GetMapping("/listar/proveedor/{idUsuario}")
-  public ArrayList<Alquiler> getAlquileresByProveedor(@PathVariable Integer idusuario) {
+  @GetMapping("/listar/proveedor/{idUsuario}")
+  public ArrayList<Alquiler> getAlquileresByProveedor(@PathVariable Integer idUsuario) {
     try {
-      return alquilerService.getAlquileresByProveedor(idusuario);
+      return alquilerService.getAlquileresByProveedor(idUsuario);
     } catch (Exception e) {
       return null;
     }
-  } */
+  }
 
   @RequestMapping("/registrar")
   public Alquiler createAlquiler(@RequestBody Alquiler alquiler) {
