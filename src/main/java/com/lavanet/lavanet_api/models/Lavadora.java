@@ -48,7 +48,6 @@ public class Lavadora {
   @JsonIgnoreProperties("lavadora") // ← Ignora la referencia circular en alquileres
   private List<Alquiler> alquileres;
 
-  // ✅ SOLUCIÓN: Agregar @JsonManagedReference
   @OneToMany(
     mappedBy = "lavadora", 
     cascade = CascadeType.ALL,

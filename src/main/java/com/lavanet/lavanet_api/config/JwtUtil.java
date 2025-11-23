@@ -6,48 +6,49 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
-import io.jsonwebtoken.UnsupportedJwtException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
 public class JwtUtil {
 
+    // Llave secreta usada para firmar y validar los tokens.
     @Value("${jwt.secret}")
     private String secret;
 
+    // Tiempo de expiración configurado para el token en milisegundos.
     @Value("${jwt.expiration-ms}")
     private Long expirationMs;
 
+    // Genera un token JWT asociado al correo del usuario y su rol, incluyendo
+    // fecha de emisión y expiración.
     public String generateToken(String correo, String rol) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationMs);
         
-        log.info("🔐 Generando token para: {} con rol: {}", correo, rol);
-        log.debug("⏰ Token expirará en: {} ms ({} horas)", expirationMs, expirationMs / 3600000);
-        
         return Jwts.builder()
                 .setSubject(correo)
-                .claim("rol", rol)
+                .claim("rol", rol) // Agregar rol.
                 .setIssuedAt(now)
                 .setExpiration(expiryDate)
-                .signWith(SignatureAlgorithm.HS256, secret)
+                .signWith(SignatureAlgorithm.HS256, secret) // Firma usando algoritmo HS256.
                 .compact();
     }
 
+    // Obtiene el correo electrónico (subject) contenido en el token.
     public String getCorreo(String token) {
         return getClaims(token).getSubject();
     }
 
+    // Obtiene el rol del usuario desde los claims personalizados.
     public String getRol(String token) {
         return (String) getClaims(token).get("rol");
     }
 
+    // Extrae el conjunto de claims del token ya validado.
     private Claims getClaims(String token) {
         return Jwts.parser()
                 .setSigningKey(secret)
@@ -55,36 +56,27 @@ public class JwtUtil {
                 .getBody();
     }
 
+    // Valida la estructura y la firma del token.
+    // Retorna true si es válido, false en caso de firma inválida o error.
     public boolean validateToken(String token) {
         try {
             Jwts.parser().setSigningKey(secret).parseClaimsJws(token);
-            log.debug("✅ Token válido");
             return true;
-            
         } catch (SignatureException ex) {
-            log.error("❌ Firma JWT inválida: {}", ex.getMessage());
-        } catch (MalformedJwtException ex) {
-            log.error("❌ Token JWT malformado: {}", ex.getMessage());
-        } catch (ExpiredJwtException ex) {
-            log.error("❌ Token JWT expirado: {}", ex.getMessage());
-        } catch (UnsupportedJwtException ex) {
-            log.error("❌ Token JWT no soportado: {}", ex.getMessage());
-        } catch (IllegalArgumentException ex) {
-            log.error("❌ Claims JWT vacío: {}", ex.getMessage());
+            return false;
+        } catch (Exception ex) {
+            return false;
         }
-        
-        return false;
     }
 
+    // Verifica si un token se encuentra expirado.
     public boolean isTokenExpired(String token) {
         try {
             Date expiration = getClaims(token).getExpiration();
             boolean expired = expiration.before(new Date());
-            log.debug("⏰ Token expirado: {} (expira: {})", expired, expiration);
             return expired;
         } catch (Exception e) {
-            log.error("❌ Error al verificar expiración: {}", e.getMessage());
-            return true;
+            return true; // Ante cualquier error se asume expirado.
         }
     }
 }

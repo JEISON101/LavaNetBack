@@ -22,61 +22,58 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
+    // encargada de validar, analizar y extraer información del token.
     private final JwtUtil jwtUtil;
+
+    // carga los detalles del usuario.
     private final UserDetailsServiceImpl userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-                
+
+        // Permitir solicitudes OPTIONS (preflight) sin validación de token.
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String requestPath = request.getRequestURI();
         String header = request.getHeader("Authorization");
 
-        log.info("🔍 Procesando request a: {}", requestPath);
-        log.debug("📋 Authorization header: {}", header);
-
-        // Si no hay header de autorización, continuar (Spring Security manejará el acceso)
+        // Si el header no existe o no tiene el formato esperado, continuar la cadena sin autenticación.
         if (header == null || !header.startsWith("Bearer ")) {
-            log.warn("⚠️ No se encontró token Bearer en el request a: {}", requestPath);
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
             String token = header.substring(7).trim(); // Eliminar "Bearer " y espacios
-            log.debug("🔑 Token extraído: {}...", token.substring(0, Math.min(20, token.length())));
-
-            // Validar el token
+            // Validar el token según las reglas establecidas en JwtUtil.
             if (!jwtUtil.validateToken(token)) {
-                log.error("❌ Token inválido o expirado para ruta: {}", requestPath);
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");
                 response.getWriter().write("{\"error\":\"Token inválido o expirado\"}");
                 return;
             }
 
-            // Extraer información del token
-            String correo = jwtUtil.getCorreo(token);
-            log.info("📧 Correo extraído del token: {}", correo);
+            // Evitar recargar autenticación si ya existe en el contexto.
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            // Cargar detalles del usuario
-            UserDetails userDetails = userDetailsService.loadUserByUsername(correo);
-            log.info("👤 Usuario cargado: {} con roles: {}", correo, userDetails.getAuthorities());
+                // Obtener correo desde el token.
+                String correo = jwtUtil.getCorreo(token);
 
-            // Establecer autenticación en el contexto de seguridad
-            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities());
+                // Cargar detalles del usuario para configurar autenticación.
+                UserDetails userDetails = userDetailsService.loadUserByUsername(correo);
 
-            SecurityContextHolder.getContext().setAuthentication(authToken);
-            log.info("✅ Autenticación exitosa para: {} en ruta: {}", correo, requestPath);
+                // Crear token de autenticación con rol del usuario.
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+
+                // Establecer autenticación en el contexto de seguridad.
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
 
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
-            log.error("⏰ Token expirado: {}", e.getMessage());
             SecurityContextHolder.clearContext();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
@@ -84,7 +81,6 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
 
         } catch (io.jsonwebtoken.MalformedJwtException e) {
-            log.error("🔴 Token malformado: {}", e.getMessage());
             SecurityContextHolder.clearContext();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
@@ -92,7 +88,6 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
 
         } catch (Exception e) {
-            log.error("💥 Error inesperado al procesar token: {}", e.getMessage(), e);
             SecurityContextHolder.clearContext();
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");
@@ -100,6 +95,7 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
+        // Continuar con la cadena de filtros.
         filterChain.doFilter(request, response);
     }
 }
