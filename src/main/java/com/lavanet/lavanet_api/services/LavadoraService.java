@@ -33,8 +33,6 @@ public class LavadoraService {
   public Lavadora createLavadora(Lavadora lavadora){
 
     if (lavadora.getFotos() != null && !lavadora.getFotos().isEmpty()) {
-      log.info("📸 Asociando {} fotos a la lavadora", lavadora.getFotos().size());
-      
       lavadora.getFotos().forEach(foto -> {
         foto.setLavadora(lavadora);
       });

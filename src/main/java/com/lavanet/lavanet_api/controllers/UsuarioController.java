@@ -33,26 +33,22 @@ public class UsuarioController {
             ResponseDto response = new ResponseDto(true, "Usuarios obtenidos correctamente", usuarios);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            ResponseDto response = new ResponseDto(false, "Error al obtener los usuarios", null, e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.badRequest().body(new ResponseDto(false, "Error al obtener los usuarios", null, e.getMessage()));
         }
     }
 
     @GetMapping("/listar/{idUsuario}")
-    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<ResponseDto> getUsuariosId(@PathVariable Integer idUsuario) {
         try {
             Usuario usuario = usuarioService.getUsuarioId(idUsuario);
             ResponseDto response = new ResponseDto(true, "Usuario obtenido correctamente", usuario, null);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            ResponseDto response = new ResponseDto(false, "Error al obtener el usuario", null, e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.badRequest().body(new ResponseDto(false, "Error al obtener el usuario", null, e.getMessage()));
         }
     }
 
     @PutMapping("/editar/{idUsuario}")
-    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<ResponseDto> putUsuario(@PathVariable Integer idUsuario, @RequestBody Usuario usuario) {
         try {
             Usuario actualizado = usuarioService.putUsuario(usuario, idUsuario);
@@ -60,21 +56,24 @@ public class UsuarioController {
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            ResponseDto response = new ResponseDto(false, "Error al actualizar el usuario", null, e.getMessage());
-            return ResponseEntity.status(500).body(response);
+            return ResponseEntity.badRequest().body(new ResponseDto(false, "Error al actualizar el usuario", null, e.getMessage()));
         }
     }
 
     @DeleteMapping("/eliminar/{idUsuario}")
-    @PreAuthorize("hasRole('Administrador')")
     public ResponseEntity<ResponseDto> deleteUsuario(@PathVariable Integer idUsuario){
         try {
             usuarioService.deleteUsuario(idUsuario);
             ResponseDto response = new ResponseDto(true, "Usuario eliminado correctamente", null, null);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            ResponseDto response = new ResponseDto(false, "Error al eliminar el usuario", null, e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.badRequest().body(new ResponseDto(false, "Error al eliminar el usuario", null, e.getMessage()));
         }
     }
+
+    // endpoints faltantes
+    // => cambiar contraseña
+    // => recuperar contraseña
+
+    // ========== fin de la clase =========
 }
