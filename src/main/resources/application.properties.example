@@ -1,0 +1,25 @@
+spring.application.name=lavanet-api
+
+#====== PROPIEDADES DE LA DB ======
+spring.datasource.url=${URL_DB}
+spring.datasource.username=${USER_DB}
+spring.datasource.password=${PASS_DB}
+spring.datasource.driver-class-name=org.postgresql.Driver
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.show-sql=true
+
+#======= PROPIEDADES JWT =========
+jwt.secret=${JWT_SECRET}
+jwt.expiration-ms=86400000
+
+#======== PROPUIEDADES PAR LOGS ===== 
+logging.level.com.lavanet.lavanet_api=DEBUG
+logging.level.org.springframework.security=DEBUG
+
+#======= PROPIEDADES DE RABBITMQ ======
+spring.rabbitmq.host=${RABBITMQ_HOST}
+spring.rabbitmq.port=${RABBITMQ_PORT}
+spring.rabbitmq.username=${RABBITMQ_USER}
+spring.rabbitmq.password=${RABBITMQ_PASS}

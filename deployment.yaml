@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-lavanet-api
+spec:
+  selector:
+    matchLabels:
+      app: lavanet-api
+  template:
+    metadata:
+      labels:
+        app: lavanet-api
+    spec:
+      containers:
+      - name: lavanet-api
+        image: lavanet-api:v1.0.0
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+        ports:
+        - containerPort: 8080
